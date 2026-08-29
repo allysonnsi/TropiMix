@@ -2,25 +2,164 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --tropi-cream: #fff8ec;
+  --tropi-cream-2: #fff1d6;
+  --tropi-green: #0f3d2e;
+  --tropi-green-light: #1d6149;
+  --tropi-yellow: #f5b72e;
+  --tropi-orange: #e87928;
+  --tropi-text-soft: #66756d;
+  --tropi-white: #ffffff;
+}
+
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  background-color: #FFF8EC;
-  color: #0F3D2E;
+  background: var(--tropi-cream);
+  color: var(--tropi-green);
+  overflow-x: hidden;
 }
 
 ::selection {
-  background-color: #F5B72E;
-  color: #0F3D2E;
+  background: var(--tropi-yellow);
+  color: var(--tropi-green);
 }
 
-/* Divisor recortado em formato de folha/onda tropical — elemento de assinatura visual */
+* {
+  box-sizing: border-box;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  outline: 3px solid var(--tropi-yellow);
+  outline-offset: 3px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--tropi-cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 61, 46, 0.25);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 61, 46, 0.45);
+}
+
+/* Containers */
+.tropi-container {
+  width: min(1180px, calc(100% - 32px));
+  margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .tropi-container {
+    width: min(1180px, calc(100% - 64px));
+  }
+}
+
+/* Text gradient */
+.tropi-gradient-text {
+  background: linear-gradient(
+    90deg,
+    var(--tropi-yellow),
+    var(--tropi-orange)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Tropical background */
+.tropical-pattern {
+  background-image:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(245, 183, 46, 0.13) 0 2px,
+      transparent 3px
+    ),
+    radial-gradient(
+      circle at 80% 70%,
+      rgba(232, 121, 40, 0.1) 0 2px,
+      transparent 3px
+    );
+  background-size: 55px 55px, 70px 70px;
+}
+
+/* Soft blob */
+.tropi-blob {
+  border-radius: 42% 58% 63% 37% / 43% 38% 62% 57%;
+}
+
+/* Floating animation */
+@keyframes tropi-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-12px) rotate(2deg);
+  }
+}
+
+.animate-tropi-float {
+  animation: tropi-float 5s ease-in-out infinite;
+}
+
+/* Marquee */
+@keyframes tropi-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.tropi-marquee {
+  animation: tropi-marquee 25s linear infinite;
+}
+
+/* Product image placeholder */
+.product-image-bg {
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(245, 183, 46, 0.32),
+      transparent 35%
+    ),
+    linear-gradient(135deg, #fff5dd, #ffe7b2);
+}
+
+/* Leaf divider */
 .leaf-divider {
   position: relative;
-  height: 44px;
   width: 100%;
+  height: 44px;
   overflow: hidden;
 }
 
@@ -31,17 +170,11 @@ body {
   height: 100%;
 }
 
-.focus-ring {
-  outline: none;
-}
-.focus-ring:focus-visible {
-  outline: 3px solid #F5B72E;
-  outline-offset: 2px;
-  border-radius: 6px;
-}
-
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
