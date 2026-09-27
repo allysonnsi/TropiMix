@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import styles from "./palette.module.css";
+import { PageHeading } from "@/components/ui/Primitives";
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
@@ -7,27 +9,29 @@ import CardapioClient from "./CardapioClient";
 
 export const metadata: Metadata = {
   title: "Cardápio | TROPI MIX",
-  description: "Confira tapiocas, cuscuz, pastéis, abacaxi temperado, açaí e sucos naturais da TROPI MIX.",
+  description:
+    "Confira tapiocas, cuscuz, pastéis, abacaxi temperado, açaí e sucos naturais da TROPI MIX.",
 };
 
 export default function CardapioPage() {
   return (
-    <>
+    <div className={styles.catalog}>
       <Navbar />
-      <main className="mx-auto max-w-6xl px-4 py-10 md:px-8">
-        <div className="mb-8">
-          <span className="text-sm font-bold uppercase tracking-wide text-caju">
-            Cardápio completo
-          </span>
-          <h1 className="font-display text-3xl font-extrabold text-mata md:text-4xl">
-            Escolha seu sabor
-          </h1>
-        </div>
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="page-main tropi-container"
+      >
+        <PageHeading
+          eyebrow="Nosso cardápio"
+          title="Escolha sua próxima pausa."
+          description="Tapiocas, cuscuz, açaí e os sabores da nossa casa."
+        />
         <Suspense fallback={<ProductGrid />}>
           <CardapioClient />
         </Suspense>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

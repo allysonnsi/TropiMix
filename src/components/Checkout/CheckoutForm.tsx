@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { EmptyState } from "@/components/ui/Primitives";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -36,7 +38,9 @@ export default function CheckoutForm() {
     setError(null);
 
     if (items.length === 0) {
-      setError("Seu carrinho está vazio. Adicione itens do cardápio antes de continuar.");
+      setError(
+        "Seu carrinho está vazio. Adicione itens do cardápio antes de continuar.",
+      );
       return;
     }
     if (!name.trim() || !phone.trim()) {
@@ -58,7 +62,8 @@ export default function CheckoutForm() {
       complement: complement.trim() || undefined,
       reference: reference.trim() || undefined,
       payment_method: payment,
-      change_for: payment === "dinheiro" && changeFor ? Number(changeFor) : null,
+      change_for:
+        payment === "dinheiro" && changeFor ? Number(changeFor) : null,
       notes: notes.trim() || undefined,
       items: items.map((i) => ({
         product_id: i.product.id,
@@ -87,16 +92,34 @@ export default function CheckoutForm() {
     }
   }
 
+  if (items.length === 0)
+    return (
+      <EmptyState
+        title="Seu pedido ainda está vazio"
+        description="Escolha seus favoritos antes de preencher os dados de entrega."
+      >
+        <Link href="/cardapio" className="ui-button ui-button--primary">
+          Ver cardápio
+        </Link>
+      </EmptyState>
+    );
+
   return (
-    <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+    <form
+      onSubmit={handleSubmit}
+      className="checkout-layout grid gap-8 lg:grid-cols-[1.4fr_1fr]"
+    >
       <div className="flex flex-col gap-6">
         <fieldset className="rounded-3xl bg-white p-6 shadow-card">
-          <legend className="mb-4 font-display text-lg font-bold text-mata">Seus dados</legend>
+          <legend className="mb-4 font-display text-lg font-bold text-mata">
+            Seus dados
+          </legend>
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="flex flex-col gap-1 text-sm font-semibold text-mata/70">
               Nome
               <input
                 required
+                autoComplete="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="focus-ring rounded-xl border-2 border-mata/10 px-4 py-2.5 text-mata"
@@ -107,6 +130,8 @@ export default function CheckoutForm() {
               Telefone
               <input
                 required
+                type="tel"
+                autoComplete="tel"
                 value={phone}
                 onChange={(e) => setPhone(formatPhoneBR(e.target.value))}
                 className="focus-ring rounded-xl border-2 border-mata/10 px-4 py-2.5 text-mata"
@@ -123,6 +148,7 @@ export default function CheckoutForm() {
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
+              aria-pressed={orderType === "retirada"}
               onClick={() => setOrderType("retirada")}
               className={`focus-ring flex flex-col items-center gap-2 rounded-2xl border-2 p-4 text-sm font-bold transition ${
                 orderType === "retirada"
@@ -134,6 +160,7 @@ export default function CheckoutForm() {
             </button>
             <button
               type="button"
+              aria-pressed={orderType === "entrega"}
               onClick={() => setOrderType("entrega")}
               className={`focus-ring flex flex-col items-center gap-2 rounded-2xl border-2 p-4 text-sm font-bold transition ${
                 orderType === "entrega"
@@ -151,6 +178,7 @@ export default function CheckoutForm() {
                 Endereço
                 <input
                   required
+                  autoComplete="street-address"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   className="focus-ring rounded-xl border-2 border-mata/10 px-4 py-2.5 text-mata"
@@ -182,29 +210,46 @@ export default function CheckoutForm() {
         </fieldset>
 
         <fieldset className="rounded-3xl bg-white p-6 shadow-card">
-          <legend className="mb-4 font-display text-lg font-bold text-mata">Pagamento</legend>
+          <legend className="mb-4 font-display text-lg font-bold text-mata">
+            Pagamento
+          </legend>
           <div className="grid grid-cols-3 gap-3">
-            {(["pix", "dinheiro", "cartao"] as PaymentMethod[]).map((method) => (
-              <button
-                key={method}
-                type="button"
-                onClick={() => setPayment(method)}
-                className={`focus-ring rounded-2xl border-2 p-3 text-sm font-bold capitalize transition ${
-                  payment === method
-                    ? "border-caju bg-caju/5 text-caju"
-                    : "border-mata/10 text-mata/60"
-                }`}
-              >
-                {method}
-              </button>
-            ))}
+            {(["pix", "dinheiro", "cartao"] as PaymentMethod[]).map(
+              (method) => (
+                <button
+                  key={
+                    method === "cartao"
+                      ? "Cartão"
+                      : method === "pix"
+                        ? "Pix"
+                        : "Dinheiro"
+                  }
+                  type="button"
+                  aria-pressed={payment === method}
+                  onClick={() => setPayment(method)}
+                  className={`focus-ring rounded-2xl border-2 p-3 text-sm font-bold capitalize transition ${
+                    payment === method
+                      ? "border-caju bg-caju/5 text-caju"
+                      : "border-mata/10 text-mata/60"
+                  }`}
+                >
+                  {method === "cartao"
+                    ? "Cartão"
+                    : method === "pix"
+                      ? "Pix"
+                      : "Dinheiro"}
+                </button>
+              ),
+            )}
           </div>
           {payment === "dinheiro" && (
             <label className="mt-4 flex flex-col gap-1 text-sm font-semibold text-mata/70">
               Troco para quanto?
               <input
                 value={changeFor}
-                onChange={(e) => setChangeFor(e.target.value.replace(/[^0-9.]/g, ""))}
+                onChange={(e) =>
+                  setChangeFor(e.target.value.replace(/[^0-9.]/g, ""))
+                }
                 className="focus-ring rounded-xl border-2 border-mata/10 px-4 py-2.5 text-mata"
                 placeholder="Ex: 50"
               />
@@ -213,8 +258,11 @@ export default function CheckoutForm() {
         </fieldset>
 
         <fieldset className="rounded-3xl bg-white p-6 shadow-card">
-          <legend className="mb-4 font-display text-lg font-bold text-mata">Observações</legend>
+          <legend className="mb-4 font-display text-lg font-bold text-mata">
+            Observações
+          </legend>
           <textarea
+            aria-label="Observações do pedido"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
@@ -225,7 +273,9 @@ export default function CheckoutForm() {
       </div>
 
       <aside className="h-fit rounded-3xl bg-white p-6 shadow-card lg:sticky lg:top-24">
-        <h2 className="mb-4 font-display text-lg font-bold text-mata">Resumo do pedido</h2>
+        <h2 className="mb-4 font-display text-lg font-bold text-mata">
+          Resumo do pedido
+        </h2>
         <ul className="mb-4 flex flex-col gap-2 text-sm text-mata/70">
           {items.map((i) => (
             <li key={i.product.id} className="flex justify-between">
@@ -255,6 +305,7 @@ export default function CheckoutForm() {
 
         {error && (
           <motion.p
+            role="alert"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="mt-4 rounded-xl bg-caju/10 p-3 text-sm font-semibold text-caju-dark"

@@ -1,16 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LockKeyhole } from "lucide-react";
-import { getSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { LockKeyhole, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import Brand from "@/components/ui/Brand";
+import { Button } from "@/components/ui/Primitives";
+import {
+  getSupabaseBrowserClient,
+  isSupabaseConfigured,
+} from "@/lib/supabase/client";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -19,12 +28,17 @@ export default function AdminLoginPage() {
 
     const supabase = getSupabaseBrowserClient();
     if (!supabase) {
-      setError("Configure o Supabase antes de acessar o painel (veja o README).");
+      setError(
+        "Configure o Supabase antes de acessar o painel (veja o README).",
+      );
       setLoading(false);
       return;
     }
 
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     setLoading(false);
 
     if (authError) {
@@ -36,60 +50,97 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-mata px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-3xl bg-white p-8 shadow-soft"
-      >
-        <div className="mb-6 flex flex-col items-center gap-2 text-center">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-mata/10 text-mata">
-            <LockKeyhole size={22} />
-          </span>
-          <h1 className="font-display text-2xl font-bold text-mata">Painel TROPI MIX</h1>
-          <p className="text-sm text-mata/50">Acesso restrito à administração</p>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1 text-sm font-semibold text-mata/70">
-            E-mail
-            <input
-              required
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="focus-ring rounded-xl border-2 border-mata/10 px-4 py-2.5 text-mata"
-              placeholder="admin@tropimix.com"
-            />
-          </label>
-          <label className="flex flex-col gap-1 text-sm font-semibold text-mata/70">
-            Senha
-            <input
-              required
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="focus-ring rounded-xl border-2 border-mata/10 px-4 py-2.5 text-mata"
-              placeholder="••••••••"
-            />
-          </label>
-        </div>
-
-        {error && <p className="mt-3 text-sm font-semibold text-caju-dark">{error}</p>}
-        {!isSupabaseConfigured && (
-          <p className="mt-3 text-xs text-mata/50">
-            Dica: configure NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY
-            para habilitar o login.
+    <main id="main-content" tabIndex={-1} className="login-page">
+      <aside className="login-story">
+        <Brand />
+        <div>
+          <p className="eyebrow">O cuidado também acontece aqui</p>
+          <h2>
+            Sua casa.
+            <br />
+            Seus sabores.
+            <br />
+            Tudo em ordem.
+          </h2>
+          <p>
+            Cuide do cardápio, acompanhe os pedidos e tenha uma visão do
+            movimento da TropiMix.
           </p>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="focus-ring mt-6 w-full rounded-full bg-mata py-3 text-sm font-bold text-white transition hover:bg-mata-light disabled:opacity-60"
+        </div>
+        <small>TropiMix · São José de Ribamar</small>
+      </aside>
+      <div className="login-area">
+        <form
+          method="post"
+          data-ready={ready}
+          onSubmit={handleSubmit}
+          className="login-form"
         >
-          {loading ? "Entrando..." : "Entrar"}
-        </button>
-      </form>
-    </div>
+          <LockKeyhole size={26} strokeWidth={1.5} />
+          <h1>Bom ter você aqui.</h1>
+          <p>Acesse sua conta para cuidar da operação da TropiMix.</p>
+          <div className="login-fields">
+            <label htmlFor="admin-email">
+              E-mail
+              <input
+                id="admin-email"
+                name="email"
+                autoComplete="username"
+                required
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Seu e-mail de acesso"
+              />
+            </label>
+            <label htmlFor="admin-password">
+              Senha
+              <div className="password-field">
+                <input
+                  id="admin-password"
+                  name="password"
+                  autoComplete="current-password"
+                  required
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Sua senha"
+                />
+                <button
+                  type="button"
+                  className="icon-button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                  aria-pressed={showPassword}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </label>
+          </div>
+          {error && (
+            <div role="alert" className="form-alert">
+              {error}
+            </div>
+          )}
+          {!isSupabaseConfigured && (
+            <div className="form-alert">
+              O acesso administrativo está indisponível neste ambiente.
+            </div>
+          )}
+          <Button
+            type="submit"
+            disabled={!ready || loading}
+            aria-busy={loading}
+          >
+            {loading ? "Entrando…" : "Entrar no painel"}
+          </Button>
+          <Link href="/" className="text-link">
+            <ArrowLeft size={15} />
+            Voltar para a loja
+          </Link>
+        </form>
+      </div>
+    </main>
   );
 }

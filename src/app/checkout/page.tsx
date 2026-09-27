@@ -1,3 +1,4 @@
+import { PageHeading } from "@/components/ui/Primitives";
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
@@ -11,13 +12,16 @@ export default function CheckoutPage() {
   return (
     <>
       <Navbar />
-      <main className="mx-auto max-w-6xl px-4 py-10 md:px-8">
-        <div className="mb-8">
-          <span className="text-sm font-bold uppercase tracking-wide text-caju">Checkout</span>
-          <h1 className="font-display text-3xl font-extrabold text-mata md:text-4xl">
-            Finalizar pedido
-          </h1>
-        </div>
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="page-main tropi-container"
+      >
+        <PageHeading
+          eyebrow="Seu pedido"
+          title="Só falta combinar os detalhes."
+          description="Conte como você quer receber e confira o seu pedido."
+        />
         <CheckoutForm />
       </main>
       <Footer />

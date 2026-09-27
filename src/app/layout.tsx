@@ -1,20 +1,14 @@
 import type { Metadata } from "next";
-import { Baloo_2, Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/hooks/useCart";
 import WhatsAppButton from "@/components/WhatsAppButton/WhatsAppButton";
 import CartDrawer from "@/components/Cart/CartDrawer";
 import MobileTabBar from "@/components/Layout/MobileTabBar";
 
-const display = Baloo_2({
+const typography = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
-  variable: "--font-display",
-});
-
-const body = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  display: "swap",
   variable: "--font-body",
 });
 
@@ -38,8 +32,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={`${display.variable} ${body.variable}`}>
+    <html lang="pt-BR" className={typography.variable}>
       <body className="font-body antialiased pb-16 md:pb-0">
+        <a className="skip-link" href="#main-content">
+          Pular para o conteúdo
+        </a>
         <CartProvider>
           {children}
           <CartDrawer />

@@ -1,31 +1,28 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: [
-    "./src/app/**/*.{ts,tsx}",
-    "./src/components/**/*.{ts,tsx}",
-  ],
+  content: ["./src/app/**/*.{ts,tsx}", "./src/components/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
         mata: {
-          DEFAULT: "#0F3D2E", // verde escuro (mata atlântica)
-          light: "#1B5E44",
+          DEFAULT: "#173E35", // verde escuro (mata atlântica)
+          light: "#28594B",
         },
         folha: {
-          DEFAULT: "#2E8B57", // verde tropical
-          light: "#4CAF7D",
+          DEFAULT: "#286347", // verde tropical
+          light: "#39744D",
         },
         caju: {
-          DEFAULT: "#F4772E", // laranja
-          dark: "#D65C1B",
+          DEFAULT: "#607B2D", // laranja
+          dark: "#4D6423",
         },
         milho: {
-          DEFAULT: "#F5B72E", // amarelo dourado
-          light: "#FFD873",
+          DEFAULT: "#DCE98D", // amarelo dourado
+          light: "#E8F0BA",
         },
-        areia: "#FFF8EC", // creme/natural
-        casca: "#FBE9CF",
+        areia: "#F8FAF5", // creme/natural
+        casca: "#EAF0DC",
       },
       fontFamily: {
         display: ["var(--font-display)"],

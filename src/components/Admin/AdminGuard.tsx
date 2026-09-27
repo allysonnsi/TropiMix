@@ -3,10 +3,18 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
-import { getSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase/client";
-import AdminSidebar from "@/components/Admin/AdminSidebar";
+import {
+  getSupabaseBrowserClient,
+  isSupabaseConfigured,
+} from "@/lib/supabase/client";
+import { ActionLink, EmptyState, Skeleton } from "@/components/ui/Primitives";
+import AdminShell from "@/components/Admin/AdminShell";
 
-export default function AdminGuard({ children }: { children: React.ReactNode }) {
+export default function AdminGuard({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   const [session, setSession] = useState<Session | null>(null);
   const [checking, setChecking] = useState(true);
@@ -24,45 +32,45 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
       if (!data.session) router.replace("/admin");
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-      if (!newSession) router.replace("/admin");
-    });
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, newSession) => {
+        setSession(newSession);
+        if (!newSession) router.replace("/admin");
+      },
+    );
 
     return () => listener.subscription.unsubscribe();
   }, [router]);
 
   if (!isSupabaseConfigured) {
     return (
-      <div className="mx-auto max-w-lg px-4 py-24 text-center">
-        <h1 className="font-display text-2xl font-bold text-mata">
-          Configure o Supabase
-        </h1>
-        <p className="mt-3 text-mata/60">
-          O painel administrativo precisa das variáveis{" "}
-          <code className="rounded bg-mata/10 px-1.5 py-0.5">NEXT_PUBLIC_SUPABASE_URL</code> e{" "}
-          <code className="rounded bg-mata/10 px-1.5 py-0.5">NEXT_PUBLIC_SUPABASE_ANON_KEY</code>{" "}
-          configuradas no arquivo <code className="rounded bg-mata/10 px-1.5 py-0.5">.env.local</code>.
-          Veja o README para o passo a passo completo.
-        </p>
-      </div>
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="page-main tropi-container"
+      >
+        <EmptyState
+          title="Painel indisponível neste ambiente"
+          description="A conexão administrativa ainda não está disponível. Volte à loja ou entre em contato com a pessoa responsável pelo sistema."
+        >
+          <ActionLink href="/">Voltar à loja</ActionLink>
+        </EmptyState>
+      </main>
     );
   }
-
   if (checking) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center text-mata/50">
-        Carregando...
-      </div>
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="page-main tropi-container"
+      >
+        <Skeleton rows={4} />
+      </main>
     );
   }
 
   if (!session) return null;
 
-  return (
-    <div className="flex min-h-screen bg-areia">
-      <AdminSidebar />
-      <div className="flex-1 px-4 py-8 md:px-10">{children}</div>
-    </div>
-  );
+  return <AdminShell>{children}</AdminShell>;
 }

@@ -1,0 +1,42 @@
+.catalog {
+ --background: #f7f8f2;
+ --surface: #fffef8;
+ --foreground: #234b3d;
+ --primary: #386345;
+ --primary-hover: #284c36;
+ --secondary: #e5ecdc;
+ --muted: #596b60;
+ --border: #d5dfcf;
+ --shadow: 0 12px 32px -20px rgb(35 75 61 / .12);
+ background: var(--background);
+ color: var(--foreground);
+ color-scheme: light;
+}
+:global(body):has(.catalog) { background: #f7f8f2; }
+.catalog :global(.site-header), .catalog :global(.mobile-menu) { background: #f7f8f2; }
+.catalog :global(.brand), .catalog :global(.brand-accent), .catalog :global(.page-heading h1), .catalog :global(.product-card h3) { color: #234b3d; }
+.catalog :global(.desktop-nav a), .catalog :global(.icon-button), .catalog :global(.mobile-menu a) { color: #386345; }
+.catalog :global(.cart-trigger), .catalog :global(.product-add) { background: #e6bd65; color: #243f32; }
+.catalog :global(.product-add:hover) { background: #edca79; color: #243f32; }
+.catalog :global(.cart-count) { background: #234b3d; color: #fffdf4; }
+.catalog :global(.category-visual) { background: #e8eedf; color: #547b4f; }
+.catalog :global(.category-visual--acai) { background: #ebe8ed; color: #695774; }
+.catalog :global(.category-visual--abacaxi-temperado), .catalog :global(.category-visual--cuscuz) { background: #f3ebd6; color: #7b632d; }
+.catalog :global(.category-orbit), .catalog :global(.category-orbit::after) { border-color: rgb(56 99 69 / .12); }
+.catalog :global(.product-price), .catalog :global(.eyebrow) { color: #386345; }
+.catalog :global(.badge-highlight) { background: #e5ecdc; color: #386345; }
+.catalog :global(.catalog-categories button[aria-pressed="true"]) { background: #386345; color: #fffef8; }
+.catalog :global(.site-footer) { background: #eef2e7; color: #234b3d; border-color: #d5dfcf; }
+.catalog :global(.site-footer a), .catalog :global(.site-footer strong) { color: #234b3d; }
+.catalog :global(.site-footer p), .catalog :global(.site-footer small), .catalog :global(.footer-bottom) { color: #596b60; }
+.catalog ~ :global(.mobile-tabbar) { background: #eef2e7; border-color: #d5dfcf; }
+.catalog ~ :global(.mobile-tabbar a), .catalog ~ :global(.mobile-tabbar button) { color: #596b60; }
+.catalog ~ :global(.mobile-tabbar a[aria-current="page"]) { background: #e1ebd8; color: #386345; }
+.catalog a:focus-visible, .catalog button:focus-visible { outline-color: #386345; }
+
+.catalog :global(.product-card .badge.badge-highlight) { color: #386345 !important; }
+.catalog :global(.site-header .store-status) { color: #596b60; background: #eef2e7; }
+
+
+.catalog :global(.category-visual:has(img)) { background: #f7f8f2; }
+.catalog :global(.category-visual img) { object-fit: contain; }

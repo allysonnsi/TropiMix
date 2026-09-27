@@ -1,7 +1,15 @@
 "use client";
 
+import {
+  PageHeading,
+  SearchField,
+  EmptyState,
+  Skeleton,
+  Button,
+} from "@/components/ui/Primitives";
 import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
+import { useActionFeedback } from "@/components/ui/useActionFeedback";
 import AdminGuard from "@/components/Admin/AdminGuard";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatBRL } from "@/lib/utils/format";
@@ -56,7 +64,19 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [items, setItems] = useState<ItemRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const { pending, feedback, run } = useActionFeedback();
   const [newAlert, setNewAlert] = useState(false);
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | "todos">(
+    "todos",
+  );
+  const filteredOrders = orders.filter(
+    (order) =>
+      (statusFilter === "todos" || order.status === statusFilter) &&
+      `${order.customer_name} ${order.id} ${order.customer_phone}`
+        .toLocaleLowerCase("pt-BR")
+        .includes(query.trim().toLocaleLowerCase("pt-BR")),
+  );
 
   async function loadOrders() {
     const supabase = getSupabaseBrowserClient();
@@ -65,7 +85,10 @@ export default function AdminOrdersPage() {
       return;
     }
     const [{ data: orderData }, { data: itemData }] = await Promise.all([
-      supabase.from("orders").select("*").order("created_at", { ascending: false }),
+      supabase
+        .from("orders")
+        .select("*")
+        .order("created_at", { ascending: false }),
       supabase.from("order_items").select("order_id,product_name,quantity"),
     ]);
     setOrders((orderData as OrderRow[]) ?? []);
@@ -88,12 +111,12 @@ export default function AdminOrdersPage() {
           setNewAlert(true);
           loadOrders();
           window.setTimeout(() => setNewAlert(false), 4000);
-        }
+        },
       )
       .on(
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "orders" },
-        () => loadOrders()
+        () => loadOrders(),
       )
       .subscribe();
 
@@ -105,45 +128,109 @@ export default function AdminOrdersPage() {
   async function updateStatus(id: string, status: OrderStatus) {
     const supabase = getSupabaseBrowserClient();
     if (!supabase) return;
-    await supabase.from("orders").update({ status }).eq("id", id);
+    if (
+      !(await run(
+        () => supabase.from("orders").update({ status }).eq("id", id),
+        "Status do pedido atualizado.",
+      ))
+    )
+      return;
     await loadOrders();
   }
 
   return (
     <AdminGuard>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-mata">Pedidos</h1>
-          <p className="text-sm text-mata/50">Acompanhe e atualize os pedidos em tempo real</p>
-        </div>
-        {newAlert && (
-          <span className="flex animate-pulse items-center gap-2 rounded-full bg-caju px-4 py-2 text-xs font-bold text-white">
-            <Bell size={14} /> Novo pedido recebido!
-          </span>
-        )}
-      </div>
-
-      {loading ? (
-        <p className="text-mata/50">Carregando pedidos...</p>
-      ) : orders.length === 0 ? (
-        <p className="rounded-3xl bg-white p-8 text-center text-mata/50 shadow-card">
-          Nenhum pedido ainda. Assim que um cliente finalizar um pedido no site, ele
-          aparecerá aqui automaticamente.
+      {feedback && (
+        <p
+          className={
+            feedback.error
+              ? "form-alert operation-feedback"
+              : "operation-success operation-feedback"
+          }
+          role={feedback.error ? "alert" : "status"}
+        >
+          {feedback.message}
         </p>
+      )}
+      <PageHeading
+        eyebrow="Da cozinha para o cliente"
+        title="Pedidos"
+        description="Acompanhe cada pedido, do recebimento à conclusão."
+      />
+      {newAlert && (
+        <div className="order-notice" role="status">
+          <Bell size={16} /> Novo pedido recebido
+        </div>
+      )}
+      <div className="admin-toolbar">
+        <SearchField
+          label="Buscar cliente ou pedido"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <label className="status-filter">
+          Status
+          <select
+            aria-label="Filtrar pedidos por status"
+            value={statusFilter}
+            onChange={(e) =>
+              setStatusFilter(e.target.value as OrderStatus | "todos")
+            }
+          >
+            <option value="todos">Todos os status</option>
+            {STATUSES.map((status) => (
+              <option key={status} value={status}>
+                {statusLabel[status]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <span className="results-count" role="status">
+          {filteredOrders.length} pedidos
+        </span>
+      </div>
+      {loading ? (
+        <Skeleton rows={2} />
+      ) : orders.length === 0 ? (
+        <EmptyState
+          title="Tudo pronto para receber pedidos"
+          description="Assim que um cliente finalizar o pedido, ele aparecerá aqui para você acompanhar."
+        />
+      ) : filteredOrders.length === 0 ? (
+        <EmptyState
+          title="Nenhum pedido para este filtro"
+          description="Busque outro cliente ou veja todos os status."
+        >
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setQuery("");
+              setStatusFilter("todos");
+            }}
+          >
+            Limpar filtros
+          </Button>
+        </EmptyState>
       ) : (
-        <div className="flex flex-col gap-4">
-          {orders.map((o) => (
-            <div key={o.id} className="rounded-3xl bg-white p-5 shadow-card">
+        <div className="order-list">
+          {filteredOrders.map((o) => (
+            <div
+              key={o.id}
+              className="order-card rounded-3xl bg-white p-5 shadow-card"
+            >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="font-display text-lg font-bold text-mata">
                     #{o.id.slice(0, 8)} · {o.customer_name}
                   </p>
                   <p className="text-xs text-mata/50">
-                    {new Date(o.created_at).toLocaleString("pt-BR")} · {o.customer_phone}
+                    {new Date(o.created_at).toLocaleString("pt-BR")} ·{" "}
+                    {o.customer_phone}
                   </p>
                 </div>
-                <span className={`rounded-full px-3 py-1 text-xs font-bold ${statusColor[o.status]}`}>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-bold ${statusColor[o.status]}`}
+                >
                   {statusLabel[o.status]}
                 </span>
               </div>
@@ -158,7 +245,9 @@ export default function AdminOrdersPage() {
                   ))}
               </ul>
 
-              {o.notes && <p className="mt-2 text-xs text-mata/50">Obs: {o.notes}</p>}
+              {o.notes && (
+                <p className="mt-2 text-xs text-mata/50">Obs: {o.notes}</p>
+              )}
 
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-mata/5 pt-3">
                 <div className="flex gap-4 text-xs font-semibold text-mata/60">
@@ -169,8 +258,12 @@ export default function AdminOrdersPage() {
                   </span>
                 </div>
                 <select
+                  disabled={pending}
+                  aria-label={"Status do pedido " + o.id.slice(0, 8)}
                   value={o.status}
-                  onChange={(e) => updateStatus(o.id, e.target.value as OrderStatus)}
+                  onChange={(e) =>
+                    updateStatus(o.id, e.target.value as OrderStatus)
+                  }
                   className="focus-ring rounded-full border-2 border-mata/10 px-3 py-1.5 text-xs font-bold text-mata"
                 >
                   {STATUSES.map((s) => (

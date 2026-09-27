@@ -10,7 +10,16 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { DollarSign, Package, Receipt, TrendingUp } from "lucide-react";
+import Link from "next/link";
+import { PageHeading, EmptyState, Skeleton } from "@/components/ui/Primitives";
+import {
+  DollarSign,
+  Package,
+  Receipt,
+  TrendingUp,
+  ChartNoAxesCombined,
+  type LucideIcon,
+} from "lucide-react";
 import AdminGuard from "@/components/Admin/AdminGuard";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatBRL } from "@/lib/utils/format";
@@ -33,7 +42,10 @@ type Period = "hoje" | "7d" | "30d";
 export default function DashboardPage() {
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [items, setItems] = useState<OrderItemRow[]>([]);
-  const [productsStats, setProductsStats] = useState({ active: 0, inactive: 0 });
+  const [productsStats, setProductsStats] = useState({
+    active: 0,
+    inactive: 0,
+  });
   const [period, setPeriod] = useState<Period>("7d");
   const [loading, setLoading] = useState(true);
 
@@ -45,30 +57,45 @@ export default function DashboardPage() {
     }
 
     (async () => {
-      const [{ data: orderData }, { data: itemData }, { data: productData }] = await Promise.all([
-        supabase.from("orders").select("id,total,created_at,status").order("created_at", { ascending: false }),
-        supabase.from("order_items").select("product_name,quantity,subtotal"),
-        supabase.from("products").select("available"),
-      ]);
+      const [{ data: orderData }, { data: itemData }, { data: productData }] =
+        await Promise.all([
+          supabase
+            .from("orders")
+            .select("id,total,created_at,status")
+            .order("created_at", { ascending: false }),
+          supabase.from("order_items").select("product_name,quantity,subtotal"),
+          supabase.from("products").select("available"),
+        ]);
 
       setOrders(orderData ?? []);
       setItems(itemData ?? []);
       setProductsStats({
-        active: (productData ?? []).filter((p: any) => p.available).length,
-        inactive: (productData ?? []).filter((p: any) => !p.available).length,
+        active: (productData ?? []).filter(
+          (p: { available: boolean }) => p.available,
+        ).length,
+        inactive: (productData ?? []).filter(
+          (p: { available: boolean }) => !p.available,
+        ).length,
       });
       setLoading(false);
     })();
   }, []);
 
   const today = new Date().toDateString();
-  const todaysOrders = orders.filter((o) => new Date(o.created_at).toDateString() === today);
+  const todaysOrders = orders.filter(
+    (o) => new Date(o.created_at).toDateString() === today,
+  );
   const salesToday = todaysOrders.reduce((sum, o) => sum + o.total, 0);
-  const avgTicket = orders.length > 0 ? orders.reduce((s, o) => s + o.total, 0) / orders.length : 0;
+  const avgTicket =
+    orders.length > 0
+      ? orders.reduce((s, o) => s + o.total, 0) / orders.length
+      : 0;
 
   const topProducts = useMemo(() => {
     const map = new Map<string, number>();
-    items.forEach((i) => map.set(i.product_name, (map.get(i.product_name) ?? 0) + i.quantity));
+    items.forEach((i) =>
+      map.set(i.product_name, (map.get(i.product_name) ?? 0) + i.quantity),
+    );
     return [...map.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
@@ -81,7 +108,9 @@ export default function DashboardPage() {
     for (let i = days - 1; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      buckets[d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })] = 0;
+      buckets[
+        d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })
+      ] = 0;
     }
     orders.forEach((o) => {
       const key = new Date(o.created_at).toLocaleDateString("pt-BR", {
@@ -95,107 +124,226 @@ export default function DashboardPage() {
 
   return (
     <AdminGuard>
-      <h1 className="font-display text-2xl font-bold text-mata">Dashboard</h1>
-      <p className="mb-6 text-sm text-mata/50">Visão geral das vendas da TROPI MIX</p>
-
+      <PageHeading
+        eyebrow="Sua operação"
+        title="Visão geral"
+        description="Um olhar sobre o movimento da sua casa."
+        action={
+          <Link
+            className="ui-button ui-button--secondary"
+            href="/admin/pedidos"
+          >
+            Acompanhar pedidos
+          </Link>
+        }
+      />
       {loading ? (
-        <p className="text-mata/50">Carregando dados...</p>
+        <Skeleton rows={4} />
       ) : (
         <>
-          <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <StatCard icon={DollarSign} label="Vendas hoje" value={formatBRL(salesToday)} />
-            <StatCard icon={Receipt} label="Pedidos hoje" value={String(todaysOrders.length)} />
-            <StatCard icon={TrendingUp} label="Ticket médio" value={formatBRL(avgTicket)} />
+          <div className="kpi-grid">
+            <StatCard
+              icon={DollarSign}
+              label="Vendas de hoje"
+              value={formatBRL(salesToday)}
+              detail="Total dos pedidos de hoje"
+            />
+            <StatCard
+              icon={Receipt}
+              label="Pedidos de hoje"
+              value={String(todaysOrders.length)}
+              detail="Pedidos registrados no dia"
+            />
+            <StatCard
+              icon={TrendingUp}
+              label="Ticket médio"
+              value={formatBRL(avgTicket)}
+              detail="Média de todos os pedidos"
+            />
             <StatCard
               icon={Package}
               label="Produtos ativos"
-              value={`${productsStats.active} ativos / ${productsStats.inactive} indisp.`}
+              value={String(productsStats.active)}
+              detail={productsStats.inactive + " indisponíveis no cardápio"}
             />
           </div>
-
-          <div className="mb-8 rounded-3xl bg-white p-6 shadow-card">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-display text-lg font-bold text-mata">Vendas por período</h2>
-              <div className="flex gap-2">
+          <section className="panel dashboard-chart">
+            <div className="panel-header">
+              <div>
+                <h2>Vendas por período</h2>
+                <p>Valor total dos pedidos registrados</p>
+              </div>
+              <div
+                className="admin-filters"
+                role="group"
+                aria-label="Período das vendas"
+              >
                 {(["hoje", "7d", "30d"] as Period[]).map((p) => (
                   <button
                     key={p}
+                    aria-pressed={period === p}
                     onClick={() => setPeriod(p)}
-                    className={`focus-ring rounded-full px-3 py-1.5 text-xs font-bold ${
-                      period === p ? "bg-mata text-white" : "bg-areia text-mata/60"
-                    }`}
                   >
                     {p === "hoje" ? "Hoje" : p === "7d" ? "7 dias" : "30 dias"}
                   </button>
                 ))}
               </div>
             </div>
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#0F3D2E15" />
-                <XAxis dataKey="date" tick={{ fontSize: 12, fill: "#0F3D2E99" }} />
-                <YAxis tick={{ fontSize: 12, fill: "#0F3D2E99" }} />
-                <Tooltip formatter={(v: number) => formatBRL(v)} />
-                <Bar dataKey="total" fill="#F4772E" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-3xl bg-white p-6 shadow-card">
-              <h2 className="mb-4 font-display text-lg font-bold text-mata">
-                Produtos mais vendidos
-              </h2>
+            {chartData.every((point) => point.total === 0) ? (
+              <div className="chart-empty">
+                <EmptyState
+                  icon={ChartNoAxesCombined}
+                  title="O movimento começa com o primeiro pedido"
+                  description="Ainda não há valores registrados neste período. As vendas aparecerão aqui conforme os pedidos chegarem."
+                />
+              </div>
+            ) : (
+              <>
+                <ResponsiveContainer width="100%" height={260}>
+                  <BarChart data={chartData} accessibilityLayer>
+                    <CartesianGrid
+                      vertical={false}
+                      strokeDasharray="3 5"
+                      stroke="var(--border)"
+                    />
+                    <XAxis
+                      dataKey="date"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 10, fill: "var(--muted)" }}
+                    />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 10, fill: "var(--muted)" }}
+                    />
+                    <Tooltip
+                      formatter={(value: number) => [
+                        formatBRL(value),
+                        "Vendas",
+                      ]}
+                      contentStyle={{
+                        borderRadius: 12,
+                        border: "1px solid var(--border)", background: "var(--surface)", color: "var(--foreground)",
+                        fontSize: 12,
+                      }}
+                    />
+                    <Bar
+                      dataKey="total"
+                      fill="#65802b"
+                      radius={[5, 5, 0, 0]}
+                      maxBarSize={36}
+                      isAnimationActive={false}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+                <details className="chart-accessible">
+                  <summary>Ver valores em tabela</summary>
+                  <table>
+                    <caption className="sr-only">
+                      Valores de vendas por dia
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Data</th>
+                        <th scope="col">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {chartData.map((point) => (
+                        <tr key={point.date}>
+                          <th scope="row">{point.date}</th>
+                          <td>{formatBRL(point.total)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </details>
+              </>
+            )}
+          </section>
+          <div className="dashboard-lower">
+            <section className="panel">
+              <div className="panel-header">
+                <div>
+                  <h2>Favoritos dos clientes</h2>
+                  <p>Produtos mais vendidos, em unidades</p>
+                </div>
+                <Link href="/admin/produtos">Ver produtos</Link>
+              </div>
               {topProducts.length === 0 ? (
-                <p className="text-sm text-mata/50">Ainda não há vendas registradas.</p>
+                <EmptyState
+                  icon={Package}
+                  title="Seus favoritos vão aparecer aqui"
+                  description="O ranking será formado pelas vendas registradas."
+                />
               ) : (
-                <ul className="flex flex-col gap-2 text-sm">
-                  {topProducts.map((p) => (
-                    <li key={p.name} className="flex justify-between text-mata/70">
-                      <span>{p.name}</span>
-                      <span className="font-bold text-mata">{p.qty}x</span>
+                <ol className="data-list">
+                  {topProducts.map((product, index) => (
+                    <li key={product.name}>
+                      <span>
+                        <small>{String(index + 1).padStart(2, "0")}</small>
+                        {product.name}
+                      </span>
+                      <strong>{product.qty} un.</strong>
                     </li>
                   ))}
-                </ul>
+                </ol>
               )}
-            </div>
-
-            <div className="rounded-3xl bg-white p-6 shadow-card">
-              <h2 className="mb-4 font-display text-lg font-bold text-mata">Pedidos recentes</h2>
+            </section>
+            <section className="panel">
+              <div className="panel-header">
+                <div>
+                  <h2>Pedidos recentes</h2>
+                  <p>Os últimos pedidos da sua loja</p>
+                </div>
+                <Link href="/admin/pedidos">Ver pedidos</Link>
+              </div>
               {orders.length === 0 ? (
-                <p className="text-sm text-mata/50">Nenhum pedido ainda.</p>
+                <EmptyState
+                  icon={Receipt}
+                  title="Tudo tranquilo por enquanto"
+                  description="Os novos pedidos aparecerão aqui assim que forem registrados."
+                />
               ) : (
-                <ul className="flex flex-col gap-2 text-sm">
-                  {orders.slice(0, 6).map((o) => (
-                    <li key={o.id} className="flex justify-between text-mata/70">
-                      <span>#{o.id.slice(0, 8)} · {o.status}</span>
-                      <span className="font-bold text-mata">{formatBRL(o.total)}</span>
+                <ul className="data-list">
+                  {orders.slice(0, 6).map((order) => (
+                    <li key={order.id}>
+                      <span>
+                        #{order.id.slice(0, 8)}
+                        <small>{order.status.replaceAll("_", " ")}</small>
+                      </span>
+                      <strong>{formatBRL(order.total)}</strong>
                     </li>
                   ))}
                 </ul>
               )}
-            </div>
+            </section>
           </div>
         </>
       )}
     </AdminGuard>
   );
 }
-
 function StatCard({
   icon: Icon,
   label,
   value,
+  detail,
 }: {
-  icon: React.ElementType;
+  icon: LucideIcon;
   label: string;
   value: string;
+  detail: string;
 }) {
   return (
-    <div className="rounded-3xl bg-white p-5 shadow-card">
-      <Icon size={18} className="text-caju" />
-      <p className="mt-3 text-xs font-bold uppercase tracking-wide text-mata/40">{label}</p>
-      <p className="mt-1 font-display text-xl font-extrabold text-mata">{value}</p>
+    <div className="kpi-card">
+      <div>
+        <span>{label}</span>
+        <Icon size={18} strokeWidth={1.5} />
+      </div>
+      <strong>{value}</strong>
+      <small>{detail}</small>
     </div>
   );
 }
