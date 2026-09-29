@@ -15,3 +15,13 @@
 .unavailable .media :global(.category-visual) { opacity: 0.65; }
 @media (max-width: 480px) { .content { padding: 14px; } .card .name { font-size: 15px; } .price { font-size: 18px; } .add { width: calc(100% - 16px); padding-inline: 8px; } }
 
+
+@media (max-width: 700px) {
+  :global(.featured-section) .content { padding: 12px 10px; gap: 6px; }
+  :global(.featured-section) .card .name { font-size: 14px; }
+  :global(.featured-section) .price { font-size: 17px; }
+  :global(.featured-section) .description { font-size: 12px; line-height: 1.5; }
+  :global(.featured-section) .category { font-size: 11px; padding-top: 8px; }
+  :global(.featured-section) .badge { top: 6px; right: 6px; padding: 4px 6px; font-size: 10px; }
+  :global(.featured-section) .add { width: calc(100% - 12px); padding-inline: 4px; gap: 4px; font-size: 12px; min-height: 44px; }
+}

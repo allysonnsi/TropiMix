@@ -2734,3 +2734,23 @@ svg {
 .checkout-layout button[aria-pressed='false'] { color: var(--muted); }
 
 .category-visual img[src^='/images/products/'] { object-fit: contain; background: #f7f8f2; }
+
+/* Compact navigation replaces the header links below the desktop breakpoint. */
+.store-dock { display: none; }
+@media (max-width: 1023px) {
+  body:has(.store-dock) {
+    padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px));
+  }
+  .store-dock {
+    display: block;
+    position: fixed;
+    z-index: 40;
+    inset-inline: 0;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    pointer-events: none;
+  }
+  .store-dock > nav { pointer-events: auto; }
+  .site-header .cart-trigger { display: none; }
+  .nav-actions > .store-status { display: inline-flex; }
+  .store-whatsapp { bottom: calc(104px + env(safe-area-inset-bottom, 0px)); }
+}

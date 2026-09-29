@@ -163,3 +163,11 @@
 @media(max-width:700px) {
  .home :global(.product-card > .category-visual:has(img)) { height: 120px; margin-bottom: 0; }
 }
+
+/* Keep featured products paired on small screens. */
+@media (max-width: 700px) {
+  .home :global(.featured-section .products-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
