@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { Hero } from "@/components/ui/animated-hero";
 import Link from "next/link";
 import { Oswald } from "next/font/google";
 import { ArrowUpRight } from "lucide-react";
@@ -16,18 +16,7 @@ export default function HomePage() {
     <div className={`${styles.home} ${display.variable}`}>
       <Navbar />
       <main id="main-content" tabIndex={-1}>
-        <section className={styles.hero}>
-          <div className={styles.heroCopy}>
-            <p className={styles.location}>São José de Ribamar · MA</p>
-            <h1>Tapioca,<br />cuscuz &<br /><span>algo mais.</span></h1>
-            <p className={styles.description}>Do café da manhã ao açaí da tarde.<br />Escolha o seu pedido no TropiMix.</p>
-            <Link className={styles.orderLink} href="/cardapio">Explorar cardápio <ArrowUpRight size={20} aria-hidden="true" /></Link>
-          </div>
-          <div className={styles.brandStage}>
-            <Image src="/images/logo01.png" alt="TropiMix" width={500} height={500} priority sizes="(max-width: 700px) 230px, 460px" />
-          </div>
-          <div className={styles.heroBottom}><span>Seu café. Seu lanche. Seu ritmo.</span><a href="#localizacao">Conheça a loja <ArrowUpRight size={16} aria-hidden="true" /></a></div>
-        </section>
+        <Hero />
         <CategoriesSection />
         <FeaturedProducts />
         <section id="sobre" className={styles.about}>

@@ -45,5 +45,5 @@ insert into products (id, category_id, category_slug, name, description, price, 
   ('p-acai-300', 'cat-acai', 'acai', 'Açaí 300ml', null, 15, true, true),
   ('p-acai-500', 'cat-acai', 'acai', 'Açaí 500ml', null, 20, true, true),
 
-  ('p-suco-natural', 'cat-sucos', 'sucos-naturais', 'Suco natural', 'Sabor do dia — consulte disponibilidade', null, true, false)
+  ('p-suco-natural', 'cat-sucos', 'sucos-naturais', 'Suco natural', 'Sabor do dia — consulte disponibilidade', 5, true, false)
 on conflict (id) do nothing;

@@ -41,6 +41,6 @@ export const seedProducts: Product[] = [
   { id: "p-acai-300", category_id: "cat-acai", category_slug: "acai", name: "Açaí 300ml", description: null, price: 15, image_url: null, available: true, featured: true },
   { id: "p-acai-500", category_id: "cat-acai", category_slug: "acai", name: "Açaí 500ml", description: null, price: 20, image_url: null, available: true, featured: true },
 
-  // SUCOS NATURAIS — nao havia preco legivel no cardapio fornecido.
-  { id: "p-suco-natural", category_id: "cat-sucos", category_slug: "sucos-naturais", name: "Suco natural", description: "Sabor do dia — consulte disponibilidade", price: null, image_url: null, available: true, featured: false },
+  // SUCOS NATURAIS
+  { id: "p-suco-natural", category_id: "cat-sucos", category_slug: "sucos-naturais", name: "Suco natural", description: "Sabor do dia — consulte disponibilidade", price: 5, image_url: null, available: true, featured: false },
 ];
