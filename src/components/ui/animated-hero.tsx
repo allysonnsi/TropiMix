@@ -12,7 +12,10 @@ const products = ["Abacaxi temperado", "Tapioca recheada", "Cuscuz quentinho", "
 export function Hero() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const reducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  const reducedMotion = mounted && prefersReducedMotion;
+  useEffect(() => setMounted(true), []);
   useEffect(() => {
     if (paused || reducedMotion) return;
     const timer = window.setTimeout(() => setIndex((current) => (current + 1) % products.length), index === 0 ? 6000 : 3500);

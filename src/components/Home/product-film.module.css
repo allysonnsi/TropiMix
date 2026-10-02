@@ -1,0 +1,10 @@
+.section { width: min(1200px, calc(100% - 80px)); margin: 0 auto 72px; display: grid; grid-template-columns: 1.55fr 1fr; gap: clamp(28px, 4vw, 64px); align-items: center; }
+.media { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; background: #e5ecdc; }
+.video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.copy h2 { font-family: var(--home-display), sans-serif; font-size: clamp(30px, 3.2vw, 44px); font-weight: 600; line-height: 1.15; color: #234b3d; text-transform: uppercase; max-width: 12ch; margin: 0 0 20px; }
+.copy p { color: #596b60; font-size: 15px; line-height: 1.8; max-width: 35ch; margin: 0 0 24px; }
+.copy a { display: inline-flex; align-items: center; gap: 16px; min-height: 44px; border-bottom: 1px solid #83967d; color: #234b3d; font-size: 14px; font-weight: 700; }
+.copy a:hover { color: #386345; border-color: currentColor; }
+.error { position: absolute; inset: auto 0 0; padding: 16px; background: #234b3d; color: white; font-size: 13px; }
+@media (max-width: 1023px) { .section { width: calc(100% - 48px); grid-template-columns: 1.3fr 1fr; gap: 28px; } }
+@media (max-width: 700px) { .section { width: calc(100% - 40px); grid-template-columns: 1fr; gap: 24px; margin-bottom: 48px; } .copy h2 { max-width: 18ch; font-size: 32px; margin-bottom: 14px; } .copy p { max-width: 40ch; margin-bottom: 14px; } }

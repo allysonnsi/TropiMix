@@ -4,6 +4,7 @@ import { Oswald } from "next/font/google";
 import { ArrowUpRight } from "lucide-react";
 import Navbar from "@/components/Navbar/Navbar";
 import CategoriesSection from "@/components/Home/CategoriesSection";
+import ProductFilm from "@/components/Home/ProductFilm";
 import FeaturedProducts from "@/components/Home/FeaturedProducts";
 import HoursLocationSection from "@/components/Home/HoursLocationSection";
 import { buildWhatsAppLinkSimple } from "@/lib/whatsapp/buildMessage";
@@ -18,6 +19,7 @@ export default function HomePage() {
       <main id="main-content" tabIndex={-1}>
         <Hero />
         <CategoriesSection />
+        <ProductFilm />
         <FeaturedProducts />
         <section id="sobre" className={styles.about}>
           <p>O TropiMix</p>
