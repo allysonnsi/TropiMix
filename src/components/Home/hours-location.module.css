@@ -1,0 +1,20 @@
+.hours { position: relative; isolation: isolate; grid-column: 1 / -1; order: -1; overflow: hidden; padding: 56px 32px; border-radius: 16px; background: #f1f5e9; color: #173f2e; }
+.hours::before, .hours::after { content: ""; position: absolute; z-index: -1; width: 220px; height: 130px; background: #386345; border-radius: 45% 55% 60% 40%; rotate: 25deg; }
+.hours::before { top: -75px; right: -65px; box-shadow: -20px 18px 0 #e0e9d4; }
+.hours::after { bottom: -95px; left: -80px; box-shadow: 18px -14px 0 #e0e9d4; }
+.inner { width: 100%; max-width: 720px; margin-inline: auto; }
+.clock { display: inline-flex; padding: 16px; border-radius: 45%; background: #dfe9d2; margin-bottom: 22px; }
+.hours .title { margin: 0; font-size: clamp(26px, 4vw, 42px); font-weight: 750; line-height: 1.2; letter-spacing: -0.025em; color: #173f2e; }
+.hours p.intro { margin: 16px 0 28px; font-size: clamp(16px, 2vw, 21px); line-height: 1.55; color: #52695b; }
+.schedule { display: grid; gap: 14px; margin: 0; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 18px; border-radius: 16px; background: #fffef8; }
+.row dt { display: flex; align-items: center; gap: 18px; font-size: 21px; font-weight: 650; }
+.icon { display: flex; padding: 12px; background: #e0e9d4; border-radius: 16px; }
+.row dd { margin: 0; padding: 10px 24px; border-radius: 32px; background: #e8efde; font-size: 22px; font-weight: 750; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.status { display: flex; align-items: center; gap: 16px; min-height: 96px; margin-top: 22px; padding: 22px 24px; border-radius: 16px; background: #e5eedb; }
+.dot { width: 12px; height: 12px; border-radius: 50%; background: #24563a; flex-shrink: 0; }
+.status strong { display: block; font-size: 22px; line-height: 1.4; }
+.status small { display: block; margin-top: 4px; color: #52695b; font-size: 16px; }
+.calendar { margin-left: auto; flex-shrink: 0; }
+@media(max-width:600px) { .hours { padding: 32px 16px; } .clock { padding: 12px; } .row { gap: 8px; padding: 12px; } .row dt { gap: 10px; font-size: 17px; } .icon { padding: 8px; } .row dd { padding: 9px 12px; font-size: 17px; } .status { padding: 18px 14px; gap: 12px; } .status strong { font-size: 18px; } .status small { font-size: 14px; } .calendar { width: 30px; } }
+@media(max-width:360px) { .row dt { gap: 6px; } .row dd { padding-inline: 8px; font-size: 16px; } .icon { padding: 5px; } }
